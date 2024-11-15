@@ -67,15 +67,21 @@ try:
     h6_elements = WebDriverWait(driver, 20).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eventName > span:nth-child(2)"))
     )
-    print(h6_elements[0].get_attribute('outerHTML'))
+    date_elements = WebDriverWait(driver, 20).until(
+    EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eventDay"))
+    )
+    year_elements = WebDriverWait(driver, 20).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eventYear"))
+    )
     # Extract and process assignment data
     assignments = [h6.text for h6 in h6_elements]
-
+    dates = [date.text for date in date_elements]
+    years = [year.text for year in year_elements]
     # Print or update the calendar with extracted assignments
     if assignments:
         print("[SUCCESS] Assignments found:")
         for assignment in assignments:
-            print(f"- {assignment}")
+            print(f"- {assignments} - Due: {dates}, {years}")
     else:
         print("[INFO] No assignments found.")
 
