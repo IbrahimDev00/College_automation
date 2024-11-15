@@ -62,16 +62,14 @@ try:
         EC.presence_of_element_located((By.CLASS_NAME, "course"))
     ).click()
 
-    # Wait for the assignments div to load
+    # Wait for the assignments to load
     print("[INFO] Waiting for assignments to load...")
-    works_div = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, ".eventName"))
+    h6_elements = WebDriverWait(driver, 20).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eventName > span:nth-child(2)"))
     )
-
+    print(h6_elements[0].get_attribute('outerHTML'))
     # Extract and process assignment data
-    assignments = []
-    for h6 in works_div:
-        assignments.append(h6.text)
+    assignments = [h6.text for h6 in h6_elements]
 
     # Print or update the calendar with extracted assignments
     if assignments:
@@ -82,7 +80,7 @@ try:
         print("[INFO] No assignments found.")
 
 except Exception as e:
-    print(f"[ERROR] An error occurred: {e}")
+    print(f"[ERROR] An error occurred: {str(e)}")
 
 finally:
     # Close the WebDriver
