@@ -50,7 +50,7 @@ try:
     solution = num1 + num2
     print(f"[INFO] CAPTCHA solved: {num1} + {num2} = {solution}")
 
-    captcha_input = driver.find_element(By.ID, "captcha_form")  # Adjust ID as needed
+    captcha_input = driver.find_element(By.ID, "captcha_form")
     captcha_input.send_keys(str(solution))
 
     
