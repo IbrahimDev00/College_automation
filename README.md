@@ -16,6 +16,7 @@ This project automates the process of logging into the GITAM portal, scraping as
 ## **Project Architecture**
 Below is a high-level overview of the workflow:
 
+![automation drawio](https://github.com/user-attachments/assets/7b699355-8419-46a1-9704-ba40b419c4fc)
 
 
 
