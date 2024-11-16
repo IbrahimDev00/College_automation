@@ -1,0 +1,13 @@
+[Unit]
+Description=A way to automate assignment addition to your calender
+After=network.target
+
+[Service]
+ExecStart=/home/ibrahim/run_gitam_scraper.sh
+WorkingDirectory=/home/ibrahim/Documents/Github_clones/College_automation/src/main.py
+User=ibrahim
+Group=ibrahim
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target 
