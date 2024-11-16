@@ -3,9 +3,9 @@ Description=A way to automate assignment addition to your calender
 After=network.target
 
 [Service]
-ExecStart=/home/ibrahim/run_gitam_scraper.sh
-WorkingDirectory=/home/ibrahim/Documents/Github_clones/College_automation/src/main.py
-User=ibrahim
+ExecStart=/home/ibrahim/run_gitam_scraper.sh #targettting the shell file on your PC (add your own path)
+WorkingDirectory=/home/ibrahim/Documents/Github_clones/College_automation/src/main.py # (add your own working directory path here)
+User=ibrahim # add your username here
 Group=ibrahim
 Restart=on-failure
 
