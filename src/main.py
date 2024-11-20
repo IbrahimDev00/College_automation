@@ -6,7 +6,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
-from calendar import add_events
+from calender import add_events
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -25,6 +26,20 @@ firefox_options = Options()
 gecko_driver_path = "/snap/bin/firefox.geckodriver"
 service = Service(executable_path=gecko_driver_path)
 driver = webdriver.Firefox(service=service, options=firefox_options)
+
+def parse_dates(dates, default_year):
+    """Convert date strings like 'Nov-07' to 'YYYY-MM-DD'."""
+    formatted_dates = []
+    for date in dates:
+        try:
+            # Parse using datetime with assumed year
+            parsed_date = datetime.strptime(f"{default_year}-{date}", "%Y-%b-%d")
+            formatted_date = parsed_date.strftime("%Y-%m-%d")
+            formatted_dates.append(formatted_date)
+        except ValueError as e:
+            print(f"[ERROR] Could not parse date '{date}': {e}")
+            formatted_dates.append(None)  # Add None for invalid dates
+    return formatted_dates
 
 try:
     print("[INFO] Navigating to the login page...")
@@ -52,11 +67,18 @@ try:
     print("[INFO] Submitting login form...")
     driver.find_element(By.ID, "Submit").click()
 
+    # Wait for the dashboard to load and the specific element to appear
+    print("[INFO] Navigating to the dashboard...")
+    WebDriverWait(driver, 35).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "course"))
+    ).click()
+
     # Wait for assignments to load
     print("[INFO] Waiting for assignments to load...")
     h6_elements = WebDriverWait(driver, 20).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eventName > span:nth-child(2)"))
     )
+    print('reached')
     date_elements = WebDriverWait(driver, 20).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, ".eventDay"))
     )
@@ -67,6 +89,8 @@ try:
     # Extract assignment data
     assignments = [h6.text for h6 in h6_elements]
     dates = [f"{year.text}-{date.text}" for date, year in zip(date_elements, year_elements)]  # Format YYYY-MM-DD
+    current_year = datetime.now().year
+    dates = parse_dates(dates, current_year)  # Convert to 'YYYY-MM-DD'
 
     # Pass assignments and dates to calendar.py
     if assignments:

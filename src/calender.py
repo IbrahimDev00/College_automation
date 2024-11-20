@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import os.path
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -6,6 +6,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+# Define the scope for Google Calendar API
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
 def authenticate_calendar():
@@ -19,7 +20,7 @@ def authenticate_calendar():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
+                "client.json", SCOPES
             )
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
@@ -39,21 +40,34 @@ def add_events(assignments, dates):
     if not service:
         print("[ERROR] Could not authenticate Google Calendar service.")
         return
-    
+
     for assignment, date in zip(assignments, dates):
+        # Convert date to ISO format with time (start and end of the day)
+        start_time = f"{date}T00:00:00+05:30"  # Midnight IST
+        end_time = f"{date}T23:59:59+05:30"   # End of the day IST
+
         event = {
             'summary': assignment,
             'start': {
-                'date': date,  # Format: YYYY-MM-DD
+                'dateTime': start_time,  # Properly formatted start time
                 'timeZone': 'Asia/Kolkata',
             },
             'end': {
-                'date': date,  # Format: YYYY-MM-DD
+                'dateTime': end_time,  # Properly formatted end time
                 'timeZone': 'Asia/Kolkata',
             },
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},  # Reminder 1 day before
+                    {'method': 'popup', 'minutes': 10},       # Popup 10 minutes before
+                ],
+            },
         }
+
         try:
-            service.events().insert(calendarId='primary', body=event).execute()
+            event_result = service.events().insert(calendarId='primary', body=event).execute()
             print(f"[SUCCESS] Event added: {assignment} on {date}")
+            print(f"Event created: {event_result.get('htmlLink')}")
         except HttpError as error:
             print(f"[ERROR] An error occurred while adding event: {error}")
